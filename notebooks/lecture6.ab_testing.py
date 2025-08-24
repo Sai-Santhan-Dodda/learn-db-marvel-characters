@@ -139,11 +139,12 @@ served_entities = [
     )
 ]
 
-workspace.serving_endpoints.create(
+workspace.serving_endpoints.update_config(
     name=endpoint_name,
-    config=EndpointCoreConfigInput(
-        served_entities=served_entities,
-    ),
+    # config=EndpointCoreConfigInput(
+    #     served_entities=served_entities,
+    # ),
+    served_entities=served_entities,
 )
 
 # COMMAND ----------

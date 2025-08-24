@@ -12,7 +12,7 @@
 import pandas as pd
 import yaml
 from loguru import logger
-from pyspark.sql import SparkSession
+from databricks.connect import DatabricksSession
 
 from marvel_characters.config import ProjectConfig
 from marvel_characters.data_processor import DataProcessor
@@ -25,7 +25,7 @@ logger.info(yaml.dump(config, default_flow_style=False))
 # COMMAND ----------
 
 # Load the Marvel characters dataset
-spark = SparkSession.builder.getOrCreate()
+spark = DatabricksSession.builder.serverless(True).getOrCreate()
 
 filepath = "../data/marvel_characters_dataset.csv"
 

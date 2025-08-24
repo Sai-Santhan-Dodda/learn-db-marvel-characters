@@ -1,14 +1,15 @@
 # Databricks notebook source
 
 import mlflow
+from dotenv import load_dotenv
 from pyspark.sql import SparkSession
 
 from marvel_characters.config import ProjectConfig, Tags
 from marvel_characters.models.custom_model import MarvelModelWrapper
-from importlib.metadata import version
-from dotenv import load_dotenv
-from mlflow import MlflowClient
 import os
+
+from importlib.metadata import version
+from mlflow import MlflowClient
 
 # Set up Databricks or local MLflow tracking
 def is_databricks():
@@ -55,14 +56,14 @@ wrapper.log_register_model(wrapped_model_uri=f"models:/{wrapped_model_version.mo
 
 # COMMAND ----------
 # unwrap and predict
-loaded_pufunc_model = mlflow.pyfunc.load_model(f"models:/{pyfunc_model_name}@latest-model")
+loaded_pyfunc_model = mlflow.pyfunc.load_model(f"models:/{pyfunc_model_name}@latest-model")
 
-unwraped_model = loaded_pufunc_model.unwrap_python_model()
+unwraped_model = loaded_pyfunc_model.unwrap_python_model()
 
 # COMMAND ----------
 unwraped_model.predict(context=None, model_input=X_test[0:1])
 # COMMAND ----------
 # another predict function with uri
 
-loaded_pufunc_model.predict(X_test[0:1])
+loaded_pyfunc_model.predict(X_test[0:1])
 # COMMAND ----------

@@ -72,12 +72,24 @@ run = mlflow.get_run(basic_model.run_id)
 
 # COMMAND ----------
 inputs = run.inputs.dataset_inputs
-training_input = next((x for x in inputs if x.tags[0].value == 'training'), None)
-training_source = mlflow.data.get_source(training_input)
-training_source.load()
+
+def has_context(inp, value):
+    return any(getattr(t, "key", None) == "mlflow.data.context" and getattr(t, "value", None) == value
+               for t in getattr(inp, "tags", []) or [])
+
+training_input = next((x for x in inputs if has_context(x, "training")), None)
+testing_input  = next((x for x in inputs if has_context(x, "testing")), None)
+
+training_source = mlflow.data.get_source(training_input) if training_input else None
+testing_source  = mlflow.data.get_source(testing_input) if testing_input else None
+
+if training_source: training_source.load()
+if testing_source:  testing_source.load()
+
 # COMMAND ----------
-testing_input = next((x for x in inputs if x.tags[0].value == 'testing'), None)
-testing_source = mlflow.data.get_source(testing_input)
+training_source.load()
+
+# COMMAND ----------
 testing_source.load()
 
 # COMMAND ----------
@@ -85,11 +97,12 @@ basic_model.register_model()
 
 # COMMAND ----------
 # only searching by name is supported
-v = mlflow.search_model_versions(
+model_versions = mlflow.search_model_versions(
     filter_string=f"name='{basic_model.model_name}'")
-print(v[0].__dict__)
+print(model_versions[0].__dict__)
 
 # COMMAND ----------
-# not supported
-v = mlflow.search_model_versions(
-    filter_string="tags.git_sha='abcd12345'")
+# Not Supported
+# v = mlflow.search_model_versions(
+#     filter_string="tags.git_sha='abcd12345'")
+# COMMAND ----------
